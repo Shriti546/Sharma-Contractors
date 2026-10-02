@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /admin/*
+Disallow: /uploads/projects/
+
+Sitemap: REPLACE_WITH_YOUR_DOMAIN/sitemap.xml

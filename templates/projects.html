@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Our Projects — SHARMA CONTRACTORS{% endblock %}
+{% block nav_class %}dark-nav{% endblock %}
+{% block content %}
+<section class="page-hero" style="min-height: 400px;">
+  <div class="page-hero-bg" style="background-image: url('https://images.unsplash.com/photo-1541888086425-d81bb19240f5?w=1920&q=80');"></div>
+  <div class="page-hero-overlay"></div>
+  <div class="page-hero-content" data-aos="fade-up">
+    <p class="section-label">Portfolio</p>
+    <h1>Our Projects</h1>
+  </div>
+</section>
+
+<section class="section container">
+  <div class="filter-bar" data-aos="fade-up">
+    <button class="filter-btn {% if active_category == 'all' %}active{% endif %}" onclick="window.location.href='?category=all'">All Projects</button>
+    {% for cat in categories %}
+    <button class="filter-btn {% if active_category == cat.slug %}active{% endif %}" onclick="window.location.href='?category={{ cat.slug }}'">{{ cat.name }}</button>
+    {% endfor %}
+  </div>
+
+  <div class="portfolio-grid" data-aos="fade-up" data-aos-delay="100">
+    {% for project in projects %}
+    <a href="{{ url_for('project_detail', slug=project.slug) }}" class="portfolio-item">
+      {% if project.cover_image %}
+      <img src="/uploads/{{ project.cover_image.filename }}" alt="{{ project.title }}" loading="lazy">
+      {% else %}
+      <div style="background:#F5F0E8; width:100%; aspect-ratio:4/3;"></div>
+      {% endif %}
+      <div class="portfolio-item-overlay">
+        {% if project.category %}
+        <span class="project-card-category">{{ project.category.name }}</span>
+        {% endif %}
+        <h3 class="project-card-title">{{ project.title }}</h3>
+      </div>
+    </a>
+    {% else %}
+    <div style="grid-column: 1/-1; text-align: center; padding: 4rem 0; color: var(--mid-gray);">
+      <p>No projects found in this category.</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — SHARMA CONTRACTORS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-body">
+
+  <button class="hamburger" id="sidebarToggle" style="position:fixed; top:1rem; right:1rem; z-index:1001; background:var(--dark); display:none;">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar-logo">
+        <span class="logo-main">SHARMA CONTRACTORS</span>
+        <span class="admin-badge">Admin Panel</span>
+      </div>
+      <nav class="admin-nav">
+        <div class="admin-nav-label">Management</div>
+        <a href="{{ url_for('admin_dashboard') }}" class="admin-nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">Dashboard</a>
+        <a href="{{ url_for('admin_projects') }}" class="admin-nav-link {% if 'admin_project' in request.endpoint %}active{% endif %}">Projects</a>
+        <a href="{{ url_for('admin_categories') }}" class="admin-nav-link {% if 'admin_categor' in request.endpoint %}active{% endif %}">Categories</a>
+        
+        <div class="admin-nav-label" style="margin-top: 2rem;">System</div>
+        <a href="{{ url_for('index') }}" class="admin-nav-link" target="_blank">View Website ↗</a>
+        <a href="{{ url_for('admin_logout') }}" class="admin-nav-link" style="color: #ef4444;">Logout</a>
+      </nav>
+    </aside>
+    
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+        <div style="font-size: 0.88rem; color: var(--mid-gray);">Welcome, Admin</div>
+      </header>
+      
+      <div class="admin-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div style="padding: 1rem 1.5rem; margin-bottom: 1.5rem; border-radius: 4px; font-size: 0.88rem; 
+                   {% if category == 'success' %}background:#f0fdf4; border:1px solid #bbf7d0; color:#166534;
+                   {% elif category == 'error' %}background:#fef2f2; border:1px solid #fecaca; color:#991b1b;
+                   {% else %}background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af;{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        
+        {% block admin_content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

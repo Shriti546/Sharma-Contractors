@@ -1,0 +1,166 @@
+{% extends 'admin/layout.html' %}
+{% block page_title %}{{ 'Edit Project' if project else 'Add New Project' }}{% endblock %}
+{% block admin_content %}
+<form action="" method="POST" enctype="multipart/form-data" class="admin-form" id="projectForm">
+  <div class="admin-form-section">
+    <div class="admin-form-section-title">Basic Information</div>
+    <div class="form-group">
+      <label for="title">Project Title *</label>
+      <input type="text" id="title" name="title" value="{{ project.title if project else '' }}" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="description">Project Description</label>
+      <textarea id="description" name="description">{{ project.description if project else '' }}</textarea>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label for="category_id">Category</label>
+        <select id="category_id" name="category_id">
+          <option value="">-- Select Category --</option>
+          {% for cat in categories %}
+          <option value="{{ cat.id }}" {% if project and project.category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+          <option value="published" {% if project and project.status == 'published' %}selected{% endif %}>Published</option>
+          <option value="draft" {% if project and project.status == 'draft' %}selected{% endif %}>Draft (Hidden)</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="admin-checkbox-group">
+      <input type="checkbox" id="is_featured" name="is_featured" value="1" {% if project and project.is_featured %}checked{% endif %}>
+      <label for="is_featured">Feature this project on the homepage</label>
+    </div>
+  </div>
+
+  <div class="admin-form-section">
+    <div class="admin-form-section-title">Project Details</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" value="{{ project.location if project else '' }}" placeholder="e.g. Mumbai, India">
+      </div>
+      <div class="form-group">
+        <label for="year">Completion Year</label>
+        <input type="number" id="year" name="year" value="{{ project.year if project else '' }}" placeholder="e.g. 2024">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="area">Project Area / Size</label>
+      <input type="text" id="area" name="area" value="{{ project.area if project else '' }}" placeholder="e.g. 15,000 sq ft">
+    </div>
+  </div>
+
+  <div class="admin-form-section">
+    <div class="admin-form-section-title">Photographs</div>
+    
+    <div class="image-upload-area" onclick="document.getElementById('imageInput').click()">
+      <div class="image-upload-icon">+</div>
+      <div class="image-upload-text">Click to browse or drag images here.<br>You can upload multiple high-quality photos.</div>
+      <input type="file" id="imageInput" name="images" multiple accept="image/*">
+    </div>
+    
+    <input type="hidden" id="coverIndex" name="cover_index" value="0">
+    <input type="hidden" id="coverImageId" name="cover_image_id" value="">
+    
+    <!-- Preview New Uploads -->
+    <div class="image-preview-grid" id="imagePreviewGrid"></div>
+
+    <!-- Existing Images (if editing) -->
+    {% if project and project.images %}
+    <div style="margin-top: 2rem;">
+      <h5 style="font-family: var(--font-sans); font-size: 0.88rem; margin-bottom: 1rem;">Existing Photographs</h5>
+      <div class="image-preview-grid">
+        {% for img in project.images %}
+        <div class="image-preview-item {% if img.is_cover %}is-cover{% endif %}">
+          <img src="/uploads/{{ img.filename }}" alt="Project image">
+          <button type="button" class="remove-img" data-delete-image="{{ img.id }}" title="Delete image">×</button>
+          <div class="set-cover" onclick="document.getElementById('coverImageId').value='{{ img.id }}'; setCover(this)">
+            {{ '✓ Cover Image' if img.is_cover else 'Set as Cover' }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+    <button type="submit" class="btn btn-gold">Save Project</button>
+    <a href="{{ url_for('admin_projects') }}" class="btn btn-outline" style="border-color: var(--light-gray); color: var(--mid-gray);">Cancel</a>
+  </div>
+</form>
+<div id="uploadProgressContainer" style="display:none; margin-top: 1rem;"><div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;"><span style="font-size:0.85rem; color:var(--charcoal);">Uploading Project...</span><span id="uploadPercent" style="font-size:0.85rem; font-weight:600; color:var(--accent);">0%</span></div><div style="width:100%; height:8px; background:var(--light-gray); border-radius:4px; overflow:hidden;"><div id="uploadProgressBar" style="height:100%; width:0%; background:var(--accent); transition:width 0.3s ease;"></div></div></div>
+  </div>
+</form>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const grid = document.getElementById('imagePreviewGrid');
+    if (grid) {
+        new Sortable(grid, {
+            animation: 150,
+            onEnd: function (evt) {
+                // Update sorting logic if needed
+            }
+        });
+    }
+
+    const form = document.getElementById('projectForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+            
+            const progressContainer = document.getElementById('uploadProgressContainer');
+            const progressBar = document.getElementById('uploadProgressBar');
+            const progressText = document.getElementById('uploadPercent');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            progressContainer.style.display = 'block';
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Uploading...';
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', form.action || window.location.href, true);
+            
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = Math.round((e.loaded / e.total) * 100);
+                    progressBar.style.width = percentComplete + '%';
+                    progressText.innerText = percentComplete + '%';
+                }
+            };
+            
+            xhr.onload = function() {
+                if (xhr.status === 200 || xhr.status === 302) {
+                    window.location.href = '/admin/projects'; // Redirect on success
+                } else {
+                    alert('Error uploading project. Please try again.');
+                    progressContainer.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Save Project';
+                }
+            };
+            
+            xhr.onerror = function() {
+                alert('Network error occurred during upload.');
+                progressContainer.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Save Project';
+            };
+            
+            xhr.send(formData);
+        });
+    }
+});
+</script>
+{% endblock %}

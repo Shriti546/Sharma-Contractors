@@ -1,0 +1,68 @@
+{% extends 'admin/layout.html' %}
+{% block page_title %}Manage Projects{% endblock %}
+{% block admin_content %}
+<div style="display: flex; justify-content: flex-end; margin-bottom: 1.5rem;">
+  <a href="{{ url_for('admin_project_new') }}" class="btn btn-gold">+ Add New Project</a>
+</div>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Image</th>
+      <th>Title</th>
+      <th>Category</th>
+      <th>Location & Year</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for project in projects %}
+    <tr>
+      <td>
+        {% if project.cover_image %}
+        <img src="/uploads/{{ project.cover_image.filename }}" alt="Cover">
+        {% else %}
+        <div style="width:60px; height:45px; background:#eee;"></div>
+        {% endif %}
+      </td>
+      <td>
+        <div style="font-weight: 500; margin-bottom: 0.2rem;">{{ project.title }}</div>
+        {% if project.is_featured %}
+        <span class="badge badge-gold" style="font-size: 0.5rem; padding: 0.1rem 0.4rem;">★ Featured</span>
+        {% endif %}
+      </td>
+      <td>{{ project.category.name if project.category else '-' }}</td>
+      <td style="color: var(--mid-gray); font-size: 0.8rem;">
+        {{ project.location or '-' }}<br>
+        {{ project.year or '-' }}
+      </td>
+      <td>
+        <span class="badge status-badge {% if project.status == 'published' %}badge-green{% else %}badge-gray{% endif %}">{{ project.status | title }}</span>
+      </td>
+      <td>
+        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+          <a href="{{ url_for('admin_project_edit', project_id=project.id) }}" class="action-btn">Edit</a>
+          
+          <button type="button" class="action-btn" data-toggle-status="{{ project.id }}">
+            {{ 'Unpublish' if project.status == 'published' else 'Publish' }}
+          </button>
+          
+          <button type="button" class="action-btn" data-toggle-featured="{{ project.id }}" {% if project.is_featured %}style="color: var(--gold);"{% endif %}>
+            {{ '★ Featured' if project.is_featured else '☆ Feature' }}
+          </button>
+          
+          <form action="{{ url_for('admin_project_delete', project_id=project.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this project permanently?');">
+            <button type="submit" class="action-btn danger">Delete</button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="6" style="text-align: center; padding: 3rem; color: var(--mid-gray);">No projects found. Click "Add New Project" to get started.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

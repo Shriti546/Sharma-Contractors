@@ -1,0 +1,66 @@
+{% extends 'admin/layout.html' %}
+{% block page_title %}Dashboard Overview{% endblock %}
+{% block admin_content %}
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card-num">{{ total_projects }}</div>
+    <div class="stat-card-label">Total Projects</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-num" style="color: #166534;">{{ published_projects }}</div>
+    <div class="stat-card-label">Published Projects</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-num" style="color: var(--gold);">{{ featured_projects }}</div>
+    <div class="stat-card-label">Featured Projects</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-num">{{ categories }}</div>
+    <div class="stat-card-label">Categories</div>
+  </div>
+</div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; margin-top: 2rem;">
+  <h2 style="font-family: var(--font-serif); font-size: 1.4rem;">Recent Projects</h2>
+  <a href="{{ url_for('admin_project_new') }}" class="btn btn-gold" style="padding: 0.5rem 1rem; font-size: 0.65rem;">+ Add New</a>
+</div>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Image</th>
+      <th>Title</th>
+      <th>Category</th>
+      <th>Status</th>
+      <th>Date Added</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for project in recent_projects %}
+    <tr>
+      <td>
+        {% if project.cover_image %}
+        <img src="/uploads/{{ project.cover_image.filename }}" alt="Cover">
+        {% else %}
+        <div style="width:60px; height:45px; background:#eee;"></div>
+        {% endif %}
+      </td>
+      <td style="font-weight: 500;">{{ project.title }}</td>
+      <td>{{ project.category.name if project.category else '-' }}</td>
+      <td>
+        <span class="badge {% if project.status == 'published' %}badge-green{% else %}badge-gray{% endif %}">{{ project.status | title }}</span>
+      </td>
+      <td style="color: var(--mid-gray); font-size: 0.8rem;">{{ project.created_at.strftime('%d %b %Y') }}</td>
+      <td>
+        <a href="{{ url_for('admin_project_edit', project_id=project.id) }}" class="action-btn">Edit</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="6" style="text-align: center; padding: 2rem; color: var(--mid-gray);">No projects added yet.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

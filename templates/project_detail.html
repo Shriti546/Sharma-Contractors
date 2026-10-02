@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}{{ project.title }} — SHARMA CONTRACTORS{% endblock %}
+{% block nav_class %}dark-nav{% endblock %}
+{% block content %}
+<section class="project-hero">
+  {% if project.cover_image %}
+  <img src="/uploads/{{ project.cover_image.filename }}" alt="{{ project.title }}">
+  {% else %}
+  <div style="width:100%; height:100%; background:#F5F0E8;"></div>
+  {% endif %}
+  <div class="project-hero-overlay"></div>
+  <div class="project-hero-info" data-aos="fade-up">
+    {% if project.category %}
+    <p class="section-label" style="color: var(--gold-light);">{{ project.category.name }}</p>
+    {% endif %}
+    <h1 style="font-family: var(--font-serif); font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 400; line-height: 1.1; margin-bottom: 0.5rem;">{{ project.title }}</h1>
+    {% if project.location %}
+    <p style="font-family: var(--font-sans); font-size: 1.1rem; color: rgba(255,255,255,0.8);">{{ project.location }}</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="container project-detail-layout">
+  <div class="project-main">
+    <div class="project-description" style="font-size: 1.05rem; color: var(--charcoal); line-height: 1.9; white-space: pre-line;">
+      {{ project.description }}
+    </div>
+    
+    {% if project.images|length > 1 %}
+    <div class="project-images-grid">
+      {% for img in project.images %}
+        {% if not img.is_cover %}
+        <a href="/uploads/{{ img.filename }}" class="glightbox" data-gallery="project-gallery">
+          <img src="/uploads/{{ img.filename }}" alt="Project Photo {{ loop.index }}" loading="lazy" {% if loop.index % 3 == 0 %}class="full-width"{% endif %}>
+        </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  
+  <aside class="project-sidebar">
+    {% if project.category %}
+    <div class="project-meta-item">
+      <div class="project-meta-label">Category</div>
+      <div class="project-meta-value">{{ project.category.name }}</div>
+    </div>
+    {% endif %}
+    {% if project.year %}
+    <div class="project-meta-item">
+      <div class="project-meta-label">Completion Year</div>
+      <div class="project-meta-value">{{ project.year }}</div>
+    </div>
+    {% endif %}
+    {% if project.area %}
+    <div class="project-meta-item">
+      <div class="project-meta-label">Project Area / Size</div>
+      <div class="project-meta-value">{{ project.area }}</div>
+    </div>
+    {% endif %}
+    
+    <div style="margin-top: 3rem;">
+      <h4 style="font-family: var(--font-accent); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem;">Share Project</h4>
+      <div style="display: flex; gap: 0.5rem;">
+        <!-- Simple share buttons placeholder -->
+        <button class="btn btn-outline" style="padding: 0.5rem; border-color: var(--light-gray); color: var(--mid-gray);" onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied!');">Copy Link</button>
+      </div>
+    </div>
+  </aside>
+</section>
+
+{% if related %}
+<section class="section" style="background: var(--cream);">
+  <div class="container">
+    <div class="text-center" style="margin-bottom: 3rem;">
+      <h2 class="section-title">Similar Projects</h2>
+    </div>
+    <div class="projects-grid">
+      {% for rel in related %}
+      <a href="{{ url_for('project_detail', slug=rel.slug) }}" class="project-card">
+        {% if rel.cover_image %}
+        <img src="/uploads/{{ rel.cover_image.filename }}" alt="{{ rel.title }}" loading="lazy">
+        {% endif %}
+        <div class="project-card-overlay">
+          <span class="project-card-category">{{ rel.category.name if rel.category else 'Project' }}</span>
+          <h3 class="project-card-title">{{ rel.title }}</h3>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

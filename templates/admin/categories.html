@@ -1,0 +1,52 @@
+{% extends 'admin/layout.html' %}
+{% block page_title %}Manage Categories{% endblock %}
+{% block admin_content %}
+<div style="display: grid; grid-template-columns: 1fr 350px; gap: 2rem;">
+  
+  <div>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Slug</th>
+          <th>Projects</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cat in categories %}
+        <tr>
+          <td style="font-weight: 500;">{{ cat.name }}</td>
+          <td style="color: var(--mid-gray); font-size: 0.8rem;">{{ cat.slug }}</td>
+          <td>{{ cat.projects|length }}</td>
+          <td>
+            <form action="{{ url_for('admin_category_delete', cat_id=cat.id) }}" method="POST" onsubmit="return confirm('Delete this category? Projects in this category will not be deleted, but they will be uncategorized.');">
+              <button type="submit" class="action-btn danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4" style="text-align: center; padding: 2rem; color: var(--mid-gray);">No categories found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <form action="{{ url_for('admin_category_new') }}" method="POST" class="admin-form" style="padding: 1.5rem;">
+      <h3 style="font-family: var(--font-serif); font-size: 1.2rem; margin-bottom: 1.5rem;">Add New Category</h3>
+      <div class="form-group">
+        <label for="name">Category Name *</label>
+        <input type="text" id="name" name="name" required placeholder="e.g. Renovation Works">
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" style="height: 80px;" placeholder="Optional short description"></textarea>
+      </div>
+      <button type="submit" class="btn btn-gold" style="width: 100%; justify-content: center;">Add Category</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
