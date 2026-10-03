@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://shriti546.github.io/sharma-contractors/sitemap.xml

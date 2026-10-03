@@ -1,0 +1,274 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}SHARMA CONTRACTORS â€” Premium Contracting & Construction{% endblock %}
+
+{% block content %}
+
+<!-- â”€â”€â”€ HERO â”€â”€â”€ -->
+<section class="hero" aria-label="Hero section">
+  <div class="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&q=85');"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-label">Welcome to SHARMA CONTRACTORS</p>
+    <h1 class="hero-title">Transforming Spaces Into<br><em>Timeless Experiences</em></h1>
+    <p class="hero-subtitle">We design beautiful, functional buildings and spaces that reflect your unique lifestyle. From concept to completion, every detail is crafted with precision and passion.</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('projects') }}" class="btn btn-gold">Explore Our Projects</a>
+      <a href="{{ url_for('contact') }}" class="btn btn-outline" style="border-color: rgba(255,255,255,0.5); color: #fff;">Get In Touch</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- â”€â”€â”€ STATS STRIP â”€â”€â”€ -->
+<div class="intro-strip">
+  <div class="container">
+    <div class="intro-strip-inner">
+      <div class="intro-stat">
+        <span class="intro-stat-num" data-counter data-suffix="+">150</span>
+        <span class="intro-stat-label">Projects Completed</span>
+      </div>
+      <div class="strip-divider"></div>
+      <div class="intro-stat">
+        <span class="intro-stat-num" data-counter data-suffix="+">13</span>
+        <span class="intro-stat-label">Years of Excellence</span>
+      </div>
+      <div class="strip-divider"></div>
+      <div class="intro-stat">
+        <span class="intro-stat-num" data-counter data-suffix="+">150</span>
+        <span class="intro-stat-label">Happy Clients</span>
+      </div>
+      <div class="strip-divider"></div>
+      <div class="intro-stat">
+        <span class="intro-stat-num" data-counter data-suffix="">15</span>
+        <span class="intro-stat-label">Cities Served</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- â”€â”€â”€ ABOUT INTRO â”€â”€â”€ -->
+<section class="section" style="background: var(--ivory);">
+  <div class="container">
+    <div class="about-intro">
+      <div class="about-intro-image" data-aos="fade-right">
+        <img src="https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?w=900&q=85" 
+             alt="SHARMA CONTRACTORS Design Studio" 
+             loading="lazy"
+             width="900" height="600">
+      </div>
+      <div class="about-intro-text" data-aos="fade-left" data-aos-delay="150">
+        <p class="section-label">About Us</p>
+        <h2 class="section-title">Design That Speaks<br>Your Language</h2>
+        <div class="gold-divider"></div>
+        <p style="color: var(--mid-gray); font-size: 1.05rem; line-height: 1.9; margin-bottom: 1.2rem;">
+          At SHARMA CONTRACTORS, we believe that a well-designed space has the power to transform how you live, work, and feel. Our passionate team of designers brings together creativity, craftsmanship, and deep understanding of your vision.
+        </p>
+        <p style="color: var(--mid-gray); font-size: 1.05rem; line-height: 1.9; margin-bottom: 2rem;">
+          Every project we undertake is a unique story â€” one that begins with listening carefully to your needs and ends with spaces that exceed your expectations.
+        </p>
+        <a href="{{ url_for('about') }}" class="btn btn-dark">Discover Our Story â†’</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- â”€â”€â”€ FEATURED PROJECTS â”€â”€â”€ -->
+<section class="section" style="background: var(--cream);">
+  <div class="container">
+    <div class="text-center" style="margin-bottom: 3.5rem;">
+      <p class="section-label" data-aos="fade-up">Our Portfolio</p>
+      <h2 class="section-title" data-aos="fade-up" data-aos-delay="100">Featured Projects</h2>
+      <div class="gold-divider" data-aos="fade-up" data-aos-delay="150"></div>
+      <p class="section-subtitle" data-aos="fade-up" data-aos-delay="200">A curated selection of our finest contracting and construction work, each project crafted with meticulous attention to detail.</p>
+    </div>
+    
+    {% if featured_projects %}
+    <div class="projects-grid" data-aos="fade-up" data-aos-delay="100">
+      {% for project in featured_projects %}
+      <a href="{{ url_for('project_detail', slug=project.slug) }}" 
+         class="project-card"
+         aria-label="View project: {{ project.title }}">
+        {% if project.cover_image %}
+        <img src="/uploads/{{ project.cover_image.filename }}" 
+             alt="{{ project.title }}" 
+             loading="lazy"
+             width="800" height="600">
+        {% else %}
+        <div class="project-placeholder" style="height: 100%;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M9 9h.01M15 9h.01M9 15h6"/>
+          </svg>
+          <span>Project Photo</span>
+        </div>
+        {% endif %}
+        <div class="project-card-overlay">
+          {% if project.category %}
+          <span class="project-card-category">{{ project.category.name }}</span>
+          {% endif %}
+          <h3 class="project-card-title">{{ project.title }}</h3>
+          {% if project.location %}
+          <p class="project-card-location">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ project.location }}
+          </p>
+          {% endif %}
+          <span class="project-card-arrow">View Project â†’</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <!-- PLACEHOLDER: Show when no projects are added yet -->
+    <div class="projects-grid" data-aos="fade-up">
+      {% set placeholder_images = [
+        'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80',
+        'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80',
+        'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=800&q=80'
+      ] %}
+      {% for img in placeholder_images %}
+      <a href="{{ url_for('projects') }}" class="project-card" aria-label="View all projects">
+        <img src="{{ img }}" alt="Construction Project" loading="lazy" width="800" height="600">
+        <div class="project-card-overlay">
+          <span class="project-card-category">Contracting & Construction</span>
+          <h3 class="project-card-title">Coming Soon</h3>
+          <p class="project-card-location">Upload your projects via Admin</p>
+          <span class="project-card-arrow">View All Projects â†’</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="text-center" style="margin-top: 3rem;">
+      <a href="{{ url_for('projects') }}" class="btn btn-outline">View All Projects</a>
+    </div>
+  </div>
+</section>
+
+<!-- â”€â”€â”€ SERVICES OVERVIEW â”€â”€â”€ -->
+<section class="section" style="background: var(--ivory);">
+  <div class="container">
+    <div class="text-center" style="margin-bottom: 3.5rem;">
+      <p class="section-label" data-aos="fade-up">What We Do</p>
+      <h2 class="section-title" data-aos="fade-up" data-aos-delay="100">Our Services</h2>
+      <div class="gold-divider" data-aos="fade-up" data-aos-delay="150"></div>
+    </div>
+    
+    <div class="services-grid">
+      {% set services_data = [
+        {
+          'title': 'Residential Construction',
+          'desc': 'Complete home Contracting & Construction from living rooms to bedrooms, crafted to reflect your personality.',
+          'icon': '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'
+        },
+        {
+          'title': 'Living Room Design',
+          'desc': 'Elegant, functional living spaces that balance comfort, aesthetics, and your lifestyle needs.',
+          'icon': '<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>'
+        },
+        {
+          'title': 'Renovation Works',
+          'desc': 'Peaceful, luxurious bedroom designs that create the perfect sanctuary for rest and rejuvenation.',
+          'icon': '<path d="M2 9V4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="M2 11v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8"/><path d="M2 11h20"/><path d="M6 11V5h12v6"/>'
+        },
+        {
+          'title': 'Modular Kitchens',
+          'desc': 'Smart, stylish modular kitchen designs that maximize space while maintaining visual elegance.',
+          'icon': '<path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>'
+        },
+        {
+          'title': 'Commercial Construction',
+          'desc': 'Professional office and commercial spaces designed to inspire productivity and impress clients.',
+          'icon': '<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>'
+        },
+        {
+          'title': 'Space Planning',
+          'desc': 'Expert space planning and custom construction solutions tailored to your unique requirements.',
+          'icon': '<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>'
+        }
+      ] %}
+      
+      {% for service in services_data %}
+      <div class="service-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
+        <div class="service-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">{{ service.icon|safe }}</svg>
+        </div>
+        <h3>{{ service.title }}</h3>
+        <p>{{ service.desc }}</p>
+        <a href="{{ url_for('services') }}" style="display: inline-block; margin-top: 1.2rem; font-family: var(--font-accent); font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); border-bottom: 1px solid var(--gold-pale); padding-bottom: 2px; transition: color 0.2s;">Learn More â†’</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- â”€â”€â”€ WHY CHOOSE US â”€â”€â”€ -->
+<section class="section why-us">
+  <div class="container">
+    <div class="why-us-inner">
+      <div class="why-us-image" data-aos="fade-right">
+        <img src="https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=900&q=85" 
+             alt="Our Design Process" loading="lazy" width="900" height="580">
+        <div class="why-us-image-badge">
+          <span class="why-badge-num">100%</span>
+          <span class="why-badge-text">Client Satisfaction</span>
+        </div>
+      </div>
+      <div class="why-us-text" data-aos="fade-left" data-aos-delay="150">
+        <p class="section-label">Why Choose Us</p>
+        <h2 class="section-title">Design Excellence,<br>Every Time</h2>
+        <div class="gold-divider"></div>
+        <p style="color: var(--mid-gray); margin-bottom: 2rem; line-height: 1.9;">
+          We don't just design spaces ” we craft experiences. Our commitment to quality, timelines, and client satisfaction sets us apart.
+        </p>
+        <div class="why-us-features">
+          {% set features = [
+            ('Personalized Approach', 'We listen first, then design. Every project is tailored to your specific lifestyle and vision.', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
+            ('Premium Materials', 'We source only high-quality materials and finishes that stand the test of time.', '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>'),
+            ('On-Time Delivery', 'We respect your time. Projects are completed on schedule without compromising on quality.', '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
+            ('End-to-End Service', 'From initial concept to final installation, we manage every aspect of your project.', '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>')
+          ] %}
+          {% for title, desc, icon in features %}
+          <div class="why-feature">
+            <div class="why-feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">{{ icon|safe }}</svg>
+            </div>
+            <div>
+              <h4>{{ title }}</h4>
+              <p>{{ desc }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- â”€â”€â”€ CTA BANNER â”€â”€â”€ -->
+<section class="cta-banner">
+  <div class="container">
+    <div class="cta-banner-content" data-aos="fade-up">
+      <p class="section-label" style="color: var(--gold-light);">Start Your Journey</p>
+      <h2>Ready to Transform Your Space?</h2>
+      <p>Let's discuss your vision and create something extraordinary together.</p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('contact') }}" class="btn btn-gold">Book a Consultation</a>
+        <a href="https://wa.me/+918860442225?text=Hello%20Sharma%20Contractors%2C%20I%20would%20like%20to%20discuss%20an%20construction%20project." 
+           class="btn btn-white" target="_blank" rel="noopener noreferrer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp Us
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+

@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Local environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# OS metadata
+.DS_Store
+Thumbs.db
