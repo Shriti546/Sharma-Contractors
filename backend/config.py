@@ -1,12 +1,15 @@
 import os
 
 class Config:
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+    
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'sharma-contractors-secret-key-2024-change-in-production'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///sharma_contractors.db'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or f"sqlite:///{os.path.join(BACKEND_DIR, 'sharma_contractors.db')}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    # Upload configuration
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+    # Upload configuration - uses root images folder
+    UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER') or os.path.join(BASE_DIR, 'images')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB max upload
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
     

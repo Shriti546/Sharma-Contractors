@@ -23,8 +23,10 @@
         <a href="{{ url_for('admin_dashboard') }}" class="admin-nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">Dashboard</a>
         <a href="{{ url_for('admin_projects') }}" class="admin-nav-link {% if 'admin_project' in request.endpoint %}active{% endif %}">Projects</a>
         <a href="{{ url_for('admin_categories') }}" class="admin-nav-link {% if 'admin_categor' in request.endpoint %}active{% endif %}">Categories</a>
+        <a href="{{ url_for('admin_settings') }}" class="admin-nav-link {% if request.endpoint == 'admin_settings' %}active{% endif %}">Site Settings</a>
         
         <div class="admin-nav-label" style="margin-top: 2rem;">System</div>
+        <a href="{{ url_for('admin_change_password') }}" class="admin-nav-link {% if request.endpoint == 'admin_change_password' %}active{% endif %}">Change Password</a>
         <a href="{{ url_for('index') }}" class="admin-nav-link" target="_blank">View Website ↗</a>
         <a href="{{ url_for('admin_logout') }}" class="admin-nav-link" style="color: #ef4444;">Logout</a>
       </nav>

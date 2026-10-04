@@ -8,9 +8,17 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.utils import secure_filename
 from PIL import Image
 from config import Config
-from models import db, Category, Project, ProjectImage, AdminUser, slugify
+from models import db, Category, Project, ProjectImage, AdminUser, SiteSetting, slugify
 
-app = Flask(__name__)
+BASE_DIR = Config.BASE_DIR
+BACKEND_DIR = Config.BACKEND_DIR
+
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BACKEND_DIR, 'templates'),
+    static_folder=BASE_DIR,
+    static_url_path='/static'
+)
 app.config.from_object(Config)
 
 # Initialize extensions
@@ -23,7 +31,7 @@ LAST_SYNC_TIME = 0
 
 def sync_images_folder():
     global LAST_SYNC_TIME
-    images_dir = 'images'
+    images_dir = app.config['UPLOAD_FOLDER']
     upload_dir = app.config['UPLOAD_FOLDER']
     if not os.path.exists(images_dir):
         return
@@ -82,11 +90,12 @@ def sync_images_folder():
             src_path = os.path.join(images_dir, filename)
             dest_path = os.path.join(upload_dir, filename)
 
-            # Copy file to uploads folder if not already there
-            if not os.path.exists(dest_path):
-                shutil.copy2(src_path, dest_path)
-            elif os.path.getmtime(src_path) > os.path.getmtime(dest_path):
-                shutil.copy2(src_path, dest_path)
+            # Copy file to uploads folder if not already there and paths differ
+            if src_path != dest_path:
+                if not os.path.exists(dest_path):
+                    shutil.copy2(src_path, dest_path)
+                elif os.path.getmtime(src_path) > os.path.getmtime(dest_path):
+                    shutil.copy2(src_path, dest_path)
 
             # ONLY add images not already in DB — NEVER modify existing DB records
             if filename not in existing_filenames:
@@ -116,6 +125,20 @@ login_manager.login_message_category = 'info'
 @login_manager.user_loader
 def load_user(user_id):
     return AdminUser.query.get(int(user_id))
+
+@app.context_processor
+def inject_site_settings():
+    settings = {}
+    try:
+        for s in SiteSetting.query.all():
+            settings[s.key] = s.value
+    except Exception:
+        pass
+
+    def get_setting(key, default=None):
+        return settings.get(key, getattr(Config, key, default))
+
+    return dict(settings=settings, get_setting=get_setting)
 
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Helper Functions
@@ -506,6 +529,64 @@ def admin_category_delete(cat_id):
     db.session.commit()
     flash(f'Category "{cat.name}" deleted.', 'success')
     return redirect(url_for('admin_categories'))
+
+@app.route('/admin/settings', methods=['GET', 'POST'])
+@login_required
+def admin_settings():
+    keys = [
+        'BUSINESS_NAME', 'BUSINESS_PHONE', 'BUSINESS_PHONE2',
+        'BUSINESS_EMAIL', 'BUSINESS_WHATSAPP', 'BUSINESS_WHATSAPP2',
+        'BUSINESS_ADDRESS', 'BUSINESS_INSTAGRAM', 'BUSINESS_FACEBOOK'
+    ]
+    if request.method == 'POST':
+        for key in keys:
+            val = request.form.get(key.lower(), '').strip()
+            setting = SiteSetting.query.filter_by(key=key).first()
+            if not setting:
+                setting = SiteSetting(key=key, value=val)
+                db.session.add(setting)
+            else:
+                setting.value = val
+        db.session.commit()
+        flash('Site settings updated successfully!', 'success')
+        return redirect(url_for('admin_settings'))
+    
+    current_settings = {}
+    try:
+        for s in SiteSetting.query.all():
+            current_settings[s.key] = s.value
+    except Exception:
+        pass
+    return render_template('admin/settings.html', settings=current_settings)
+
+@app.route('/admin/change-password', methods=['GET', 'POST'])
+@login_required
+def admin_change_password():
+    if request.method == 'POST':
+        current_password = request.form.get('current_password', '').encode('utf-8')
+        new_password = request.form.get('new_password', '').encode('utf-8')
+        confirm_password = request.form.get('confirm_password', '').encode('utf-8')
+        
+        user = AdminUser.query.get(current_user.id)
+        if not user or not bcrypt.checkpw(current_password, user.password_hash.encode('utf-8')):
+            flash('Current password is incorrect.', 'error')
+            return redirect(url_for('admin_change_password'))
+            
+        if new_password != confirm_password:
+            flash('New passwords do not match.', 'error')
+            return redirect(url_for('admin_change_password'))
+            
+        if len(new_password) < 6:
+            flash('Password must be at least 6 characters.', 'error')
+            return redirect(url_for('admin_change_password'))
+            
+        hashed = bcrypt.hashpw(new_password, bcrypt.gensalt()).decode('utf-8')
+        user.password_hash = hashed
+        db.session.commit()
+        flash('Password changed successfully!', 'success')
+        return redirect(url_for('admin_dashboard'))
+        
+    return render_template('admin/change_password.html')
 
 
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
